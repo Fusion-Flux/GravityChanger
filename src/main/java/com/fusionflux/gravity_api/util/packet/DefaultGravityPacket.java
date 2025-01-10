@@ -23,6 +23,12 @@ public class DefaultGravityPacket extends GravityPacket implements ClientboundAn
     public final RotationParameters rotationParameters;
     public final boolean initialGravity;
 
+    public DefaultGravityPacket(Direction direction, RotationParameters rotationParameters, boolean initialGravity) {
+        this.direction = direction;
+        this.rotationParameters = rotationParameters;
+        this.initialGravity = initialGravity;
+    }
+
     public DefaultGravityPacket(int entityId, Direction direction, RotationParameters rotationParameters, boolean initialGravity) {
         this.entityId = entityId;
         this.direction = direction;

@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.api;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -10,8 +11,6 @@ import com.fusionflux.gravity_api.util.*;
 import com.fusionflux.gravity_api.util.packet.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
@@ -57,11 +56,13 @@ public abstract class GravityChangerAPI {
         return Direction.DOWN;
     }
 
-    public static ArrayList<Gravity> getGravityList(Entity entity) {
+    public static List<Gravity> getGravityList(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
-            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravity).orElse(new ArrayList<Gravity>());
+            return maybeGetSafe(GRAVITY_COMPONENT, entity)
+                    .map(GravityComponent::getGravity)
+                    .orElse(new ArrayList<>());
         }
-        return new ArrayList<Gravity>();
+        return new ArrayList<>();
     }
 
     public static Direction getPrevGravtityDirection(Entity entity) {
@@ -134,19 +135,19 @@ public abstract class GravityChangerAPI {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.addGravity(gravity, false);
-                    GravityChannel.UPDATE_GRAVITY.sendToClient(entity, new UpdateGravityPacket(gravity, false), NetworkUtil.PacketMode.EVERYONE);
+                    GravityPacketSender.sendToAllClients(entity.getServer(), new UpdateGravityPacket(entity.getId(), gravity, false));
                 });
             }
         }
     }
 
     @Environment(EnvType.CLIENT)
-    public static void addGravityClient(LocalPlayer entity, Gravity gravity, ResourceLocation verifier, FriendlyByteBuf verifierInfo) {
+    public static void addGravityClient(LocalPlayer entity, Gravity gravity) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.addGravity(gravity, false);
-                    GravityChannel.UPDATE_GRAVITY.sendToServer(new UpdateGravityPacket(gravity, false), verifier, verifierInfo);
+                    GravityPacketSender.sendToServer(new UpdateGravityPacket(gravity, false));
                 });
             }
         }
@@ -171,7 +172,7 @@ public abstract class GravityChangerAPI {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setGravity(gravity, false);
-                    GravityChannel.OVERWRITE_GRAVITY.sendToClient(entity, new OverwriteGravityPacket(gravity, false), NetworkUtil.PacketMode.EVERYONE);
+                    GravityPacketSender.sendToAllClients(entity.getServer(), new OverwriteGravityPacket(entity.getId(), gravity, false));
                 });
             }
         }
@@ -318,12 +319,12 @@ public abstract class GravityChangerAPI {
         return RotationUtil.vecPlayerToWorld(0, (double) entity.getEyeHeight(), 0, getGravityDirection(entity));
     }
 
-    private static boolean onCorrectSide(Entity entity, boolean shouldBeOnServer){
-        if(entity.level().isClientSide() && shouldBeOnServer) {
+    private static boolean onCorrectSide(Entity entity, boolean shouldBeOnServer) {
+        if (entity.level().isClientSide() && shouldBeOnServer) {
             GravityChangerMod.LOGGER.error("GravityChangerAPI function cannot be called from the server, use dedicated client server. ", new Exception());
             return false;
         }
-        if(!entity.level().isClientSide() && !shouldBeOnServer) {
+        if (!entity.level().isClientSide() && !shouldBeOnServer) {
             GravityChangerMod.LOGGER.error("GravityChangerAPI function cannot be called from the client, use dedicated client client. ", new Exception());
             return false;
         }

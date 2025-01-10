@@ -18,6 +18,10 @@ public class DefaultGravityStrengthPacket extends GravityPacket implements Clien
     
     public final double strength;
 
+    public DefaultGravityStrengthPacket(double strength) {
+        this.strength = strength;
+    }
+
     public DefaultGravityStrengthPacket(int entityId, double strength) {
         this.entityId = entityId;
         this.strength = strength;

@@ -25,6 +25,11 @@ public class OverwriteGravityPacket extends GravityPacket implements Clientbound
     public final List<Gravity> gravityList;
     public final boolean initialGravity;
 
+    public OverwriteGravityPacket(List<Gravity> gravityList, boolean initialGravity) {
+        this.gravityList = gravityList;
+        this.initialGravity = initialGravity;
+    }
+
     public OverwriteGravityPacket(int entityId, List<Gravity> gravityList, boolean initialGravity) {
         this.entityId = entityId;
         this.gravityList = gravityList;

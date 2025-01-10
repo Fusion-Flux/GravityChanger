@@ -21,9 +21,14 @@ public class UpdateGravityPacket extends GravityPacket implements ClientboundAnd
     public final Gravity gravity;
     public final boolean initialGravity;
 
+    public UpdateGravityPacket(Gravity gravity, boolean initialGravity) {
+        this.gravity = gravity;
+        this.initialGravity = initialGravity;
+    }
+
     public UpdateGravityPacket(int entityId, Gravity gravity, boolean initialGravity) {
-        this.entityId= entityId;
-        this.gravity =  gravity;
+        this.entityId = entityId;
+        this.gravity = gravity;
         this.initialGravity = initialGravity;
     }
 

@@ -22,6 +22,12 @@ public class InvertGravityPacket extends GravityPacket implements ClientboundAnd
     public final RotationParameters rotationParameters;
     public final boolean initialGravity;
 
+    public InvertGravityPacket(boolean inverted, RotationParameters rotationParameters, boolean initialGravity) {
+        this.inverted = inverted;
+        this.rotationParameters = rotationParameters;
+        this.initialGravity = initialGravity;
+    }
+
     public InvertGravityPacket(int entityId, boolean inverted, RotationParameters rotationParameters, boolean initialGravity){
         this.entityId = entityId;
         this.inverted = inverted;
